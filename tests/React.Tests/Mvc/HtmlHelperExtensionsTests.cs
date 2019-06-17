@@ -38,7 +38,7 @@ namespace React.Tests.Mvc
 			component.Setup(x => x.RenderHtml(It.IsAny<TextWriter>(), false, false, null, null))
 				.Callback((TextWriter writer, bool renderContainerOnly, bool renderServerOnly, Action<Exception, string, string> exceptionHandler, IRenderFunctions renderFunctions) => writer.Write("HTML"));
 
-			component.Setup(x => x.RenderJavaScript(It.IsAny<TextWriter>())).Callback((TextWriter writer) => writer.Write("JS"));
+			component.Setup(x => x.RenderJavaScript(It.IsAny<TextWriter>(), It.IsAny<bool>())).Callback((TextWriter writer) => writer.Write("JS"));
 
 			var environment = ConfigureMockEnvironment();
 			environment.Setup(x => x.CreateComponent(
@@ -77,7 +77,7 @@ namespace React.Tests.Mvc
 			component.Setup(x => x.RenderHtml(It.IsAny<TextWriter>(), false, false, null, null))
 				.Callback((TextWriter writer, bool renderContainerOnly, bool renderServerOnly, Action<Exception, string, string> exceptionHandle, IRenderFunctions renderFunctions) => writer.Write("HTML")).Verifiable();
 
-			component.Setup(x => x.RenderJavaScript(It.IsAny<TextWriter>())).Callback((TextWriter writer) => writer.Write("JS")).Verifiable();
+			component.Setup(x => x.RenderJavaScript(It.IsAny<TextWriter>(), It.IsAny<bool>())).Callback((TextWriter writer) => writer.Write("JS")).Verifiable();
 
 			var config = new Mock<IReactSiteConfiguration>();
 

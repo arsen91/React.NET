@@ -139,8 +139,14 @@ namespace React
 		/// <param name="renderServerOnly">Only renders the common HTML mark up and not any React specific data attributes. Used for server-side only rendering.</param>
 		/// <param name="exceptionHandler">A custom exception handler that will be called if a component throws during a render. Args: (Exception ex, string componentName, string containerId)</param>
 		/// <param name="renderFunctions">Functions to call during component render</param>
+		/// <param name="renderImmediately"></param>
 		/// <returns>HTML</returns>
-		public virtual void RenderHtml(TextWriter writer, bool renderContainerOnly = false, bool renderServerOnly = false, Action<Exception, string, string> exceptionHandler = null, IRenderFunctions renderFunctions = null)
+		public virtual void RenderHtml(
+			TextWriter writer, 
+			bool renderContainerOnly = false, 
+			bool renderServerOnly = false, 
+			Action<Exception, string, string> exceptionHandler = null, 
+			IRenderFunctions renderFunctions = null)
 		{
 			if (!_configuration.UseServerSideRendering)
 			{
@@ -233,7 +239,7 @@ namespace React
 		/// <returns>JavaScript</returns>
 		public virtual string RenderJavaScript()
 		{
-			return GetStringFromWriter(renderJsWriter => RenderJavaScript(renderJsWriter));
+			return GetStringFromWriter(renderJsWriter => RenderJavaScript(renderJsWriter, renderImmediately: true));
 		}
 
 		/// <summary>
@@ -242,15 +248,26 @@ namespace React
 		/// server-rendered HTML.
 		/// </summary>
 		/// <param name="writer">The <see cref="T:System.IO.TextWriter" /> to which the content is written</param>
+		/// <param name="renderImmediately"></param>
 		/// <returns>JavaScript</returns>
-		public virtual void RenderJavaScript(TextWriter writer)
+		public virtual void RenderJavaScript(TextWriter writer, bool renderImmediately)
 		{
+			if (!renderImmediately)
+			{
+				writer.Write("window.addEventListener('DOMContentLoaded', function() {");
+			}
+
 			writer.Write(
 				!_configuration.UseServerSideRendering || ClientOnly ? "ReactDOM.render(" : "ReactDOM.hydrate(");
 			WriteComponentInitialiser(writer);
 			writer.Write(", document.getElementById(\"");
 			writer.Write(ContainerId);
 			writer.Write("\"))");
+
+			if (!renderImmediately)
+			{
+				writer.Write("});");
+			}
 		}
 
 		/// <summary>
